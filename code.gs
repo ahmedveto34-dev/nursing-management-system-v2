@@ -20,25 +20,25 @@ function doPost(e) {
     
     // توجيه الطلبات حسب العملية المطلوبة (Action)
     if (action === 'getAdmissions') {
-      result = getSheetData(ss, 'Admissions', ['id', 'date', 'patientId', 'ward', 'type']);
+      result = getSheetData(ss, 'Admissions', ['id', 'date', 'patientId', 'ward', 'type', 'patientName']);
     } else if (action === 'addAdmission') {
-      result = appendRow(ss, 'Admissions', [payload.id, payload.date, payload.patientId, payload.ward, payload.type]);
+      result = appendRow(ss, 'Admissions', [payload.id, payload.date, payload.patientId, payload.ward, payload.type, payload.patientName]);
     } else if (action === 'getBedsores') {
-      result = getSheetData(ss, 'Bedsores', ['id', 'date', 'patientId', 'stage', 'location', 'progress']);
+      result = getSheetData(ss, 'Bedsores', ['id', 'date', 'patientId', 'stage', 'location', 'progress', 'patientName']);
     } else if (action === 'addBedsore') {
-      result = appendRow(ss, 'Bedsores', [payload.id, payload.date, payload.patientId, payload.stage, payload.location, payload.progress]);
+      result = appendRow(ss, 'Bedsores', [payload.id, payload.date, payload.patientId, payload.stage, payload.location, payload.progress, payload.patientName]);
     } else if (action === 'getInfections') {
-      result = getSheetData(ss, 'Infections', ['id', 'date', 'patientId', 'infectionType', 'infectionSite', 'isolationProtocol']);
+      result = getSheetData(ss, 'Infections', ['id', 'date', 'patientId', 'infectionType', 'infectionSite', 'isolationProtocol', 'patientName']);
     } else if (action === 'addInfection') {
-      result = appendRow(ss, 'Infections', [payload.id, payload.date, payload.patientId, payload.infectionType, payload.infectionSite || payload.site, payload.isolationProtocol]);
+      result = appendRow(ss, 'Infections', [payload.id, payload.date, payload.patientId, payload.infectionType, payload.infectionSite || payload.site, payload.isolationProtocol, payload.patientName]);
     } else if (action === 'getFalls') {
-      result = getSheetData(ss, 'Falls', ['id', 'date', 'patientId', 'riskAssessment', 'location', 'postFallAction']);
+      result = getSheetData(ss, 'Falls', ['id', 'date', 'patientId', 'riskAssessment', 'location', 'postFallAction', 'patientName']);
     } else if (action === 'addFall') {
-      result = appendRow(ss, 'Falls', [payload.id, payload.date, payload.patientId, payload.riskAssessment, payload.location, payload.postFallAction]);
+      result = appendRow(ss, 'Falls', [payload.id, payload.date, payload.patientId, payload.riskAssessment, payload.location, payload.postFallAction, payload.patientName]);
     } else if (action === 'getCardiac') {
-      result = getSheetData(ss, 'CardiacArrests', ['id', 'date', 'patientId', 'responseTime', 'outcome']);
+      result = getSheetData(ss, 'CardiacArrests', ['id', 'date', 'patientId', 'responseTime', 'outcome', 'patientName']);
     } else if (action === 'addCardiac') {
-      result = appendRow(ss, 'CardiacArrests', [payload.id, payload.date, payload.patientId, payload.responseTime, payload.outcome]);
+      result = appendRow(ss, 'CardiacArrests', [payload.id, payload.date, payload.patientId, payload.responseTime, payload.outcome, payload.patientName]);
     } else {
       throw new Error('عملية غير معروفة: ' + action);
     }
@@ -101,11 +101,11 @@ function appendRow(ss, sheetName, values) {
   if (!sheet) {
     // تهيئة الجدول بالعناوين المناسبة إذا كان غير موجود
     var headers = [];
-    if (sheetName === 'Admissions') headers = ['id', 'date', 'patientId', 'ward', 'type'];
-    else if (sheetName === 'Bedsores') headers = ['id', 'date', 'patientId', 'stage', 'location', 'progress'];
-    else if (sheetName === 'Infections') headers = ['id', 'date', 'patientId', 'infectionType', 'site', 'isolationProtocol'];
-    else if (sheetName === 'Falls') headers = ['id', 'date', 'patientId', 'riskAssessment', 'location', 'postFallAction'];
-    else if (sheetName === 'CardiacArrests') headers = ['id', 'date', 'patientId', 'responseTime', 'outcome'];
+    if (sheetName === 'Admissions') headers = ['id', 'date', 'patientId', 'ward', 'type', 'patientName'];
+    else if (sheetName === 'Bedsores') headers = ['id', 'date', 'patientId', 'stage', 'location', 'progress', 'patientName'];
+    else if (sheetName === 'Infections') headers = ['id', 'date', 'patientId', 'infectionType', 'infectionSite', 'isolationProtocol', 'patientName'];
+    else if (sheetName === 'Falls') headers = ['id', 'date', 'patientId', 'riskAssessment', 'location', 'postFallAction', 'patientName'];
+    else if (sheetName === 'CardiacArrests') headers = ['id', 'date', 'patientId', 'responseTime', 'outcome', 'patientName'];
     
     sheet = ss.insertSheet(sheetName);
     sheet.appendRow(headers);

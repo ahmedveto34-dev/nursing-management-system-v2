@@ -44,6 +44,11 @@ export const fetchApi = async (endpoint: string, options: RequestInit = {}) => {
     // const ss = SpreadsheetApp.openById(incoming.sheetId);
     const response = await fetch(API_URL, {
       method: 'POST',
+      mode: 'cors',
+      redirect: 'follow',
+      headers: {
+        'Content-Type': 'text/plain;charset=utf-8',
+      },
       body: JSON.stringify({
         sheetId: SHEET_ID,
         action,
@@ -52,7 +57,9 @@ export const fetchApi = async (endpoint: string, options: RequestInit = {}) => {
     });
 
     if (!response.ok) {
-      throw new Error('فشل الاتصال بقاعدة بيانات Google Sheets عبر الرابط المحدد VITE_API_URL');
+      const errText = await response.text().catch(() => '');
+      console.error('GAS API Error:', response.status, response.statusText, errText);
+      throw new Error(`فشل الاتصال بقاعدة بيانات Google Sheets (Status: ${response.status}). ${errText ? 'Details: ' + errText : 'عبر الرابط المحدد VITE_API_URL'}`);
     }
 
     const resData = await response.json();

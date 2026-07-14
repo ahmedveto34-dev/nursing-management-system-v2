@@ -15,7 +15,8 @@ export default function AdmissionsView() {
   }, []);
 
   const loadData = async () => {
-    try {
+    
+try {
       const res = await getAdmissions();
       setData(res);
     } catch (e) {
@@ -28,16 +29,26 @@ export default function AdmissionsView() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSubmitting(true);
-    const form = e.currentTarget;
+    const form = e.target as HTMLFormElement;
     const formData = new FormData(form);
     const payload = {
       date: format(new Date(), 'yyyy-MM-dd HH:mm'),
-      patientId: formData.get('patientId'),
+      patientId: formData.get('patientId') as string,
+      patientName: formData.get('patientName') as string,
       ward: formData.get('ward'),
       type: formData.get('type'),
     };
     
     try {
+      
+      const isDuplicate = data.some(item => item.patientId === payload.patientId && item.type === payload.type);
+      if (isDuplicate) {
+        if (!window.confirm(translate('duplicateWarning'))) {
+          setSubmitting(false);
+          return;
+        }
+      }
+
       await addAdmission(payload);
       form.reset();
       await loadData();
@@ -57,6 +68,11 @@ export default function AdmissionsView() {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">{translate('patientId')}</label>
             <input required name="patientId" type="text" className="w-full rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-indigo-500" />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{translate('patientName')}</label>
+            <input required name="patientName" type="text" className="w-full rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-indigo-500" />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">{translate('ward')}</label>
@@ -87,20 +103,22 @@ export default function AdmissionsView() {
               <tr>
                 <th className="p-4 font-medium">{translate('dateAndTime')}</th>
                 <th className="p-4 font-medium">{translate('patientId')}</th>
+                <th className="p-4 font-medium">{translate('patientName')}</th>
                 <th className="p-4 font-medium">{translate('ward')}</th>
                 <th className="p-4 font-medium">{translate('type')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
               {loading ? (
-                <tr><td colSpan={4} className="p-8 text-center text-gray-500">{translate('loading')}</td></tr>
+                <tr><td colSpan={5} className="p-8 text-center text-gray-500">{translate('loading')}</td></tr>
               ) : data.length === 0 ? (
-                <tr><td colSpan={4} className="p-8 text-center text-gray-500">{translate('noData')}</td></tr>
+                <tr><td colSpan={5} className="p-8 text-center text-gray-500">{translate('noData')}</td></tr>
               ) : (
                 data.map((item, i) => (
                   <tr key={i} className="hover:bg-gray-50">
                     <td className="p-4 text-sm">{item.date}</td>
                     <td className="p-4 font-medium">{item.patientId}</td>
+                    <td className="p-4">{item.patientName || '-'}</td>
                     <td className="p-4">{item.ward}</td>
                     <td className="p-4">
                       <span className={`px-3 py-1 rounded-full text-xs font-medium ${item.type === translate('admission') || item.type === 'دخول' || item.type === 'Admission' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
