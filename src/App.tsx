@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { LayoutDashboard, Users, Activity, AlertTriangle, HeartPulse, LogOut } from 'lucide-react';
+import { LayoutDashboard, Users, Activity, AlertTriangle, HeartPulse, LogOut, Globe } from 'lucide-react';
 import DashboardView from './components/DashboardView';
 import AdmissionsView from './components/AdmissionsView';
 import BedsoresView from './components/BedsoresView';
 import InfectionsView from './components/InfectionsView';
 import FallsView from './components/FallsView';
 import CardiacView from './components/CardiacView';
+import { useLanguage } from './lib/LanguageContext';
 
 type View = 'dashboard' | 'admissions' | 'bedsores' | 'infections' | 'falls' | 'cardiac';
 
@@ -14,6 +15,7 @@ export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const { language, setLanguage, translate } = useLanguage();
 
   useEffect(() => {
     const auth = localStorage.getItem('hospital_auth');
@@ -29,7 +31,7 @@ export default function App() {
       localStorage.setItem('hospital_auth', 'true');
       setError('');
     } else {
-      setError('كلمة المرور غير صحيحة');
+      setError(translate('wrongPassword'));
     }
   };
 
@@ -39,20 +41,32 @@ export default function App() {
     setPassword('');
   };
 
+  const toggleLanguage = () => {
+    setLanguage(language === 'ar' ? 'en' : 'ar');
+  };
+
+  const dir = language === 'ar' ? 'rtl' : 'ltr';
+
   if (!isAuthenticated) {
     return (
-      <div className="flex h-screen items-center justify-center bg-gray-50" dir="rtl">
+      <div className="flex h-screen items-center justify-center bg-gray-50" dir={dir}>
+        <div className="absolute top-4 right-4 rtl:left-4 rtl:right-auto">
+          <button onClick={toggleLanguage} className="flex items-center gap-2 px-3 py-2 bg-white rounded-lg shadow-sm border border-gray-200 text-gray-600 hover:text-indigo-600 transition-colors">
+            <Globe className="w-4 h-4" />
+            <span className="text-sm font-medium">{language === 'ar' ? 'English' : 'العربية'}</span>
+          </button>
+        </div>
         <div className="bg-white p-10 rounded-2xl shadow-xl max-w-md w-full text-center border border-gray-100">
           <HeartPulse className="w-16 h-16 mx-auto text-indigo-600 mb-6" />
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">نظام إدارة التمريض</h1>
-          <p className="text-gray-500 mb-8">الرجاء إدخال كلمة المرور للوصول إلى النظام</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">{translate('appTitle')}</h1>
+          <p className="text-gray-500 mb-8">{translate('loginPrompt')}</p>
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="كلمة المرور"
+                placeholder={translate('password')}
                 className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors text-center"
                 dir="ltr"
               />
@@ -62,7 +76,7 @@ export default function App() {
               type="submit"
               className="w-full bg-indigo-600 text-white font-medium rounded-lg text-sm px-5 py-3 hover:bg-indigo-700 transition-colors"
             >
-              تسجيل الدخول
+              {translate('login')}
             </button>
           </form>
         </div>
@@ -83,21 +97,23 @@ export default function App() {
   };
 
   const navItems = [
-    { id: 'dashboard', label: 'لوحة البيانات', icon: LayoutDashboard },
-    { id: 'admissions', label: 'حالات الدخول والخروج', icon: Users },
-    { id: 'bedsores', label: 'قرح الفراش', icon: Activity },
-    { id: 'infections', label: 'حالات العدوى', icon: AlertTriangle },
-    { id: 'falls', label: 'حالات السقوط', icon: AlertTriangle },
-    { id: 'cardiac', label: 'توقف القلب (كود بلو)', icon: HeartPulse },
+    { id: 'dashboard', label: translate('dashboard'), icon: LayoutDashboard },
+    { id: 'admissions', label: translate('admissions'), icon: Users },
+    { id: 'bedsores', label: translate('bedsores'), icon: Activity },
+    { id: 'infections', label: translate('infections'), icon: AlertTriangle },
+    { id: 'falls', label: translate('falls'), icon: AlertTriangle },
+    { id: 'cardiac', label: translate('cardiac'), icon: HeartPulse },
   ] as const;
 
   return (
-    <div className="flex h-screen bg-gray-50 text-gray-900 font-sans" dir="rtl">
+    <div className="flex h-screen bg-gray-50 text-gray-900 font-sans" dir={dir}>
       {/* Sidebar */}
-      <aside className="w-64 bg-white border-l border-gray-200 flex flex-col hidden md:flex print:hidden">
-        <div className="p-6 border-b border-gray-200 flex items-center gap-3 text-indigo-600">
-          <HeartPulse className="w-8 h-8" />
-          <span className="text-xl font-bold">إدارة التمريض</span>
+      <aside className={`w-64 bg-white ${language === 'ar' ? 'border-l' : 'border-r'} border-gray-200 flex flex-col hidden md:flex print:hidden`}>
+        <div className="p-6 border-b border-gray-200 flex items-center justify-between gap-3 text-indigo-600">
+          <div className="flex items-center gap-2">
+            <HeartPulse className="w-8 h-8" />
+            <span className="text-xl font-bold">{translate('appTitle')}</span>
+          </div>
         </div>
         <nav className="flex-1 p-4 space-y-1">
           {navItems.map((item) => {
@@ -118,13 +134,20 @@ export default function App() {
             );
           })}
         </nav>
-        <div className="p-4 border-t border-gray-200">
+        <div className="p-4 border-t border-gray-200 space-y-2">
+          <button
+            onClick={toggleLanguage}
+            className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-lg transition-colors"
+          >
+            <Globe className="w-4 h-4" />
+            {language === 'ar' ? 'English' : 'العربية'}
+          </button>
           <button
             onClick={handleLogout}
             className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
           >
             <LogOut className="w-4 h-4" />
-            تسجيل الخروج
+            {translate('logout')}
           </button>
         </div>
       </aside>
@@ -135,11 +158,16 @@ export default function App() {
         <header className="bg-white border-b border-gray-200 p-4 flex justify-between items-center md:hidden print:hidden">
           <div className="flex items-center gap-2 text-indigo-600">
             <HeartPulse className="w-6 h-6" />
-            <span className="font-bold">إدارة التمريض</span>
+            <span className="font-bold">{translate('appTitle')}</span>
           </div>
-          <button onClick={handleLogout} className="text-gray-500 p-2">
-            <LogOut className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-2">
+            <button onClick={toggleLanguage} className="text-gray-500 p-2">
+              <Globe className="w-5 h-5" />
+            </button>
+            <button onClick={handleLogout} className="text-gray-500 p-2">
+              <LogOut className="w-5 h-5" />
+            </button>
+          </div>
         </header>
 
         {/* View Content */}
@@ -152,3 +180,4 @@ export default function App() {
     </div>
   );
 }
+
