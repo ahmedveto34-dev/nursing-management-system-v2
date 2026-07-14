@@ -58,11 +58,21 @@ function doGet(e) {
   return ContentService.createTextOutput("Google Apps Script for Nursing Management System is Running Successfully.");
 }
 
+function getSheetCaseInsensitive(ss, sheetName) {
+  var sheets = ss.getSheets();
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].getName().toLowerCase() === sheetName.toLowerCase()) {
+      return sheets[i];
+    }
+  }
+  return null;
+}
+
 /**
  * دالة مساعدة لجلب البيانات من جدول معين بشكل مرن وتلقائي
  */
 function getSheetData(ss, sheetName, headers) {
-  var sheet = ss.getSheetByName(sheetName);
+  var sheet = getSheetCaseInsensitive(ss, sheetName);
   if (!sheet) {
     // إنشاء الجدول في حال عدم وجوده مع إدراج العناوين الأولى تلقائياً لتهيئة الملف للعمل
     sheet = ss.insertSheet(sheetName);
@@ -87,7 +97,7 @@ function getSheetData(ss, sheetName, headers) {
  * دالة مساعدة لإضافة سطر جديد للجدول بشكل تلقائي
  */
 function appendRow(ss, sheetName, values) {
-  var sheet = ss.getSheetByName(sheetName);
+  var sheet = getSheetCaseInsensitive(ss, sheetName);
   if (!sheet) {
     // تهيئة الجدول بالعناوين المناسبة إذا كان غير موجود
     var headers = [];
