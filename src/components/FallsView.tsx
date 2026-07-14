@@ -26,7 +26,8 @@ export default function FallsView() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSubmitting(true);
-    const formData = new FormData(e.currentTarget);
+    const form = e.currentTarget;
+    const formData = new FormData(form);
     const payload = {
       date: format(new Date(), 'yyyy-MM-dd HH:mm'),
       patientId: formData.get('patientId'),
@@ -37,11 +38,11 @@ export default function FallsView() {
     
     try {
       await addFall(payload);
-      e.currentTarget.reset();
+      form.reset();
       await loadData();
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      alert('حدث خطأ أثناء الحفظ');
+      alert('حدث خطأ أثناء الحفظ\n' + err.message);
     } finally {
       setSubmitting(false);
     }
