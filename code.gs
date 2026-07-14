@@ -28,9 +28,9 @@ function doPost(e) {
     } else if (action === 'addBedsore') {
       result = appendRow(ss, 'Bedsores', [payload.id, payload.date, payload.patientId, payload.stage, payload.location, payload.progress]);
     } else if (action === 'getInfections') {
-      result = getSheetData(ss, 'Infections', ['id', 'date', 'patientId', 'infectionType', 'site', 'isolationProtocol']);
+      result = getSheetData(ss, 'Infections', ['id', 'date', 'patientId', 'infectionType', 'infectionSite', 'isolationProtocol']);
     } else if (action === 'addInfection') {
-      result = appendRow(ss, 'Infections', [payload.id, payload.date, payload.patientId, payload.infectionType, payload.site, payload.isolationProtocol]);
+      result = appendRow(ss, 'Infections', [payload.id, payload.date, payload.patientId, payload.infectionType, payload.infectionSite || payload.site, payload.isolationProtocol]);
     } else if (action === 'getFalls') {
       result = getSheetData(ss, 'Falls', ['id', 'date', 'patientId', 'riskAssessment', 'location', 'postFallAction']);
     } else if (action === 'addFall') {

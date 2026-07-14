@@ -1,8 +1,20 @@
 export const fetchApi = async (endpoint: string, options: RequestInit = {}) => {
   const API_URL = (import.meta as any).env?.VITE_API_URL || 'https://script.google.com/macros/s/AKfycbz1aGJVF24K2mWjic9uFw2oZVC8q81KFtBFJMCjIML7jyoMLU6bYo2PqxM84UzJGuNv/exec';
-  const SHEET_ID = (import.meta as any).env?.VITE_SHEET_ID;
+  let SHEET_ID = (import.meta as any).env?.VITE_SHEET_ID;
 
   if (API_URL) {
+    if (!SHEET_ID) {
+      throw new Error("يرجى إضافة VITE_SHEET_ID (معرف جدول بيانات جوجل) في إعدادات التطبيق أو Vercel");
+    }
+
+    // تنظيف المعرف في حال قام المستخدم بنسخ الرابط بالكامل
+    if (SHEET_ID.includes('google.com/spreadsheets/d/')) {
+      const match = SHEET_ID.match(/\/d\/([a-zA-Z0-9-_]+)/);
+      if (match) {
+        SHEET_ID = match[1];
+      }
+    }
+
     // Determine the action and payload based on endpoint and options
     let action = '';
     let payload: any = undefined;
