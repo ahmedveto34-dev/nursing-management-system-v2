@@ -45,7 +45,7 @@ export default function AdmissionsView() {
         setPatientNameInput(recordWithName.patientName);
       }
       
-      const isCurrentlyAdmitted = patientRecords.some(d => (!d.dischargeDate || d.dischargeDate === '') && (d.status === 'دخول' || d.type === 'دخول' || d.type === 'Admission'));
+      const isCurrentlyAdmitted = patientRecords.some(d => (!d.dischargeDate || d.dischargeDate === '') && (d.status === 'دخول' || d.type === 'دخول' || d.type === 'Admission' || (!d.status && !d.type)));
       
       if (isCurrentlyAdmitted && (formType === 'دخول' || formType === translate('admission'))) {
         setPatientExistsError('هذا المريض مسجل دخول مسبقاً ولم يتم خروجه');
@@ -125,10 +125,12 @@ export default function AdmissionsView() {
       if (formType === 'دخول' || formType === translate('admission')) {
         const payload = {
           admissionDate: dateStr,
+          date: dateStr, // For backward compatibility with old script
           patientId: formData.get('patientId') as string,
           patientName: formData.get('patientName') as string,
           ward: formData.get('ward'),
-          status: 'دخول'
+          status: 'دخول',
+          type: 'دخول' // For backward compatibility with old script
         };
         await addAdmission(payload);
       } else {
@@ -154,7 +156,7 @@ export default function AdmissionsView() {
     }
   };
 
-  const activeAdmissions = data.filter(d => (!d.dischargeDate || d.dischargeDate === '') && (d.status === 'دخول' || d.type === 'دخول' || d.type === 'Admission'));
+  const activeAdmissions = data.filter(d => (!d.dischargeDate || d.dischargeDate === '') && (d.status === 'دخول' || d.type === 'دخول' || d.type === 'Admission' || (!d.status && !d.type)));
 
   return (
     <div className="space-y-6">
