@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { LayoutDashboard, Users, Activity, AlertTriangle, HeartPulse, LogOut, Globe } from 'lucide-react';
+import { LayoutDashboard, Users, Activity, AlertTriangle, HeartPulse, LogOut, Globe, Archive } from 'lucide-react';
 import DashboardView from './components/DashboardView';
 import AdmissionsView from './components/AdmissionsView';
+import ArchiveView from './components/ArchiveView';
 import BedsoresView from './components/BedsoresView';
 import InfectionsView from './components/InfectionsView';
 import FallsView from './components/FallsView';
@@ -9,7 +10,7 @@ import CardiacView from './components/CardiacView';
 import RRTView from './components/RRTView';
 import { useLanguage } from './lib/LanguageContext';
 
-type View = 'dashboard' | 'admissions' | 'bedsores' | 'infections' | 'falls' | 'cardiac' | 'rrt';
+type View = 'dashboard' | 'admissions' | 'archive' | 'bedsores' | 'infections' | 'falls' | 'cardiac' | 'rrt';
 
 export default function App() {
   const [activeView, setActiveView] = useState<View>('dashboard');
@@ -89,6 +90,7 @@ export default function App() {
     switch (activeView) {
       case 'dashboard': return <DashboardView />;
       case 'admissions': return <AdmissionsView />;
+      case 'archive': return <ArchiveView />;
       case 'bedsores': return <BedsoresView />;
       case 'infections': return <InfectionsView />;
       case 'falls': return <FallsView />;
@@ -101,6 +103,7 @@ export default function App() {
   const navItems = [
     { id: 'dashboard', label: translate('dashboard'), icon: LayoutDashboard },
     { id: 'admissions', label: translate('admissions'), icon: Users },
+    { id: 'archive', label: language === 'ar' ? 'أرشيف الخروج' : 'Discharge Archive', icon: Archive },
     { id: 'bedsores', label: translate('bedsores'), icon: Activity },
     { id: 'infections', label: translate('infections'), icon: AlertTriangle },
     { id: 'falls', label: translate('falls'), icon: AlertTriangle },

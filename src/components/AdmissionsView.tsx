@@ -230,20 +230,22 @@ export default function AdmissionsView() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {loading ? (
+              {(() => {
+    const activeAdmissions = data.filter(item => !item.dischargeDate);
+    return loading ? (
                 <tr>
                   <td colSpan={8} className="p-8 text-center text-gray-500">
                     <Loader2 className="w-6 h-6 animate-spin mx-auto" />
                   </td>
                 </tr>
-              ) : data.length === 0 ? (
+              ) : activeAdmissions.length === 0 ? (
                 <tr>
                   <td colSpan={8} className="p-8 text-center text-gray-500">
                     {translate('noData')}
                   </td>
                 </tr>
               ) : (
-                data.map((item, i) => (
+                activeAdmissions.map((item, i) => (
                   <tr key={item.id || i} className="hover:bg-gray-50 transition-colors">
                     <td className="p-4 text-sm">{item.admissionDate || item.date || '-'}</td>
                     <td className="p-4 text-sm">{item.dischargeDate || '-'}</td>
@@ -268,23 +270,26 @@ export default function AdmissionsView() {
                     </td>
                   </tr>
                 ))
-              )}
+              );
+            })()}
             </tbody>
           </table>
         </div>
 
         {/* Mobile Cards */}
         <div className="md:hidden flex flex-col divide-y divide-gray-100">
-          {loading ? (
+          {(() => {
+            const activeAdmissions = data.filter(item => !item.dischargeDate);
+            return loading ? (
             <div className="p-8 text-center text-gray-500">
               <Loader2 className="w-6 h-6 animate-spin mx-auto" />
             </div>
-          ) : data.length === 0 ? (
+          ) : activeAdmissions.length === 0 ? (
             <div className="p-8 text-center text-gray-500">
               {translate('noData')}
             </div>
           ) : (
-            data.map((item, i) => (
+            activeAdmissions.map((item, i) => (
               <div key={item.id || i} className="p-4 space-y-3 hover:bg-gray-50 transition-colors">
                 <div className="flex justify-between items-start">
                   <div>
@@ -324,7 +329,8 @@ export default function AdmissionsView() {
                 )}
               </div>
             ))
-          )}
+          );
+          })()}
         </div>
       </div>
     </div>

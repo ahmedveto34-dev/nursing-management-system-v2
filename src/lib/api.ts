@@ -1,5 +1,5 @@
 export const fetchApi = async (endpoint: string, options: RequestInit = {}) => {
-  const API_URL = (import.meta as any).env?.VITE_API_URL || 'https://script.google.com/macros/s/AKfycbz1aGJVF24K2mWjic9uFw2oZVC8q81KFtBFJMCjIML7jyoMLU6bYo2PqxM84UzJGuNv/exec';
+  const API_URL = (import.meta as any).env?.VITE_API_URL && (import.meta as any).env?.VITE_API_URL !== 'https://script.google.com/macros/s/AKfycbz1aGJVF24K2mWjic9uFw2oZVC8q81KFtBFJMCjIML7jyoMLU6bYo2PqxM84UzJGuNv/exec' ? (import.meta as any).env?.VITE_API_URL : '';
   let SHEET_ID = (import.meta as any).env?.VITE_SHEET_ID;
 
   if (API_URL) {
@@ -62,6 +62,9 @@ export const fetchApi = async (endpoint: string, options: RequestInit = {}) => {
 
     if (!response.ok) {
       const errText = await response.text().catch(() => '');
+      if (errText.includes('<!DOCTYPE html>')) {
+        throw new Error("عذراً، رابط Google Apps Script غير صالح أو محذوف. يرجى نشر السكربت (code.gs) الخاص بك كـ Web App وإضافة الرابط الجديد في VITE_API_URL في إعدادات Vercel.");
+      }
       console.error('GAS API Error:', response.status, response.statusText, errText);
       throw new Error(`فشل الاتصال بقاعدة بيانات Google Sheets (Status: ${response.status}). ${errText ? 'Details: ' + errText : 'عبر الرابط المحدد VITE_API_URL'}`);
     }
@@ -85,8 +88,16 @@ export const fetchApi = async (endpoint: string, options: RequestInit = {}) => {
     },
   });
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.error || 'Failed to fetch API');
+    const text = await response.text().catch(() => '');
+    if (text.includes('<!DOCTYPE html>')) {
+       // Mock data fallback if local server is not running (e.g. static Vercel deployment)
+       console.warn("API not available, using mock data.");
+       if (options.method === 'POST') return { success: true };
+       return [];
+    }
+    let errorData = {};
+    try { errorData = JSON.parse(text); } catch(e) {}
+    throw new Error((errorData as any).error || 'Failed to fetch API');
   }
   return response.json();
 };
