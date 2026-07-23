@@ -8,11 +8,33 @@ export default function CardiacView() {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [patientIdInput, setPatientIdInput] = useState('');
+  const [patientNameInput, setPatientNameInput] = useState('');
   const { translate } = useLanguage();
 
   useEffect(() => {
     loadData();
   }, []);
+
+  const handlePatientIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const id = e.target.value;
+    setPatientIdInput(id);
+    
+    if (!id) {
+      setPatientNameInput('');
+      return;
+    }
+    
+    const patientRecords = data.filter(d => d.patientId === id);
+    if (patientRecords.length > 0) {
+      const recordWithName = patientRecords.find(d => d.patientName);
+      if (recordWithName) {
+        setPatientNameInput(recordWithName.patientName);
+      }
+    } else {
+      setPatientNameInput('');
+    }
+  };
 
   const loadData = async () => {
     
@@ -51,6 +73,8 @@ try {
 
       await addCardiac(payload);
       form.reset();
+      setPatientIdInput('');
+      setPatientNameInput('');
       await loadData();
     } catch (err: any) {
       console.error(err);
@@ -67,12 +91,12 @@ try {
         <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">{translate('patientId')}</label>
-            <input required name="patientId" type="text" className="w-full rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-indigo-500" />
+            <input required name="patientId" type="text" value={patientIdInput} onChange={handlePatientIdChange} className="w-full rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-indigo-500" />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">{translate('patientName')}</label>
-            <input required name="patientName" type="text" className="w-full rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-indigo-500" />
+            <input required name="patientName" type="text" value={patientNameInput} onChange={(e) => setPatientNameInput(e.target.value)} className="w-full rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-indigo-500" />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">زمن الاستجابة (بالدقائق)</label>
