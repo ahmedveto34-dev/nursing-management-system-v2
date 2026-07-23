@@ -1,4 +1,5 @@
-/**
+const fs = require('fs');
+const newCode = `/**
  * كود Google Apps Script الخاص بنظام إدارة التمريض (code.gs)
  * 
  * يرجى نسخ هذا الكود بالكامل ولصقه في مشروع Google Apps Script الخاص بك (ملحقات > Apps Script)
@@ -149,3 +150,5 @@ function updateDischarge(ss, sheetName, patientId, dischargeDate, dischargeReaso
   
   return { success: true };
 }
+`;
+fs.writeFileSync('code.gs', newCode);
