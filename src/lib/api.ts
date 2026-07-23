@@ -1,5 +1,11 @@
 export const fetchApi = async (endpoint: string, options: RequestInit = {}) => {
-  const API_URL = (import.meta as any).env?.VITE_API_URL && (import.meta as any).env?.VITE_API_URL !== 'https://script.google.com/macros/s/AKfycbz1aGJVF24K2mWjic9uFw2oZVC8q81KFtBFJMCjIML7jyoMLU6bYo2PqxM84UzJGuNv/exec' ? (import.meta as any).env?.VITE_API_URL : '';
+  let API_URL = (import.meta as any).env?.VITE_API_URL && (import.meta as any).env?.VITE_API_URL !== 'https://script.google.com/macros/s/AKfycbz1aGJVF24K2mWjic9uFw2oZVC8q81KFtBFJMCjIML7jyoMLU6bYo2PqxM84UzJGuNv/exec' ? (import.meta as any).env?.VITE_API_URL : '';
+  if (API_URL && API_URL.includes('/macros/s/')) {
+    const match = API_URL.match(/(https:\/\/script\.google\.com\/macros\/s\/[a-zA-Z0-9-_]+)/);
+    if (match) {
+      API_URL = match[1] + '/exec';
+    }
+  }
   let SHEET_ID = (import.meta as any).env?.VITE_SHEET_ID;
 
   if (API_URL) {
@@ -69,7 +75,16 @@ export const fetchApi = async (endpoint: string, options: RequestInit = {}) => {
       throw new Error(`فشل الاتصال بقاعدة بيانات Google Sheets (Status: ${response.status}). ${errText ? 'Details: ' + errText : 'عبر الرابط المحدد VITE_API_URL'}`);
     }
 
-    const resData = await response.json();
+    const text = await response.text();
+    if (text.includes('Google Apps Script for Nursing Management System is Running Successfully.')) {
+      throw new Error('رابط VITE_API_URL غير صحيح: تم تحويل طلب POST إلى GET. تأكد من أن الرابط ينتهي بـ /exec ولا تستخدم روابط مختصرة.');
+    }
+    let resData;
+    try {
+      resData = JSON.parse(text);
+    } catch (e) {
+      throw new Error('استجابة غير صالحة من الخادم (ليست JSON). قد يكون الرابط خاطئاً أو السكربت يرجع خطأ غير متوقع.');
+    }
     if (resData && resData.error) {
       if (resData.error.includes("عملية غير معروفة") || resData.error.includes("Unknown operation")) {
         throw new Error("يجب تحديث VITE_API_URL في إعدادات Vercel برابط Apps Script الجديد الخاص بك، الرابط الافتراضي لا يحتوي على التحديثات الأخيرة!");
