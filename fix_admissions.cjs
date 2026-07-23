@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+const fs = require('fs');
+const content = `import React, { useEffect, useState } from 'react';
 import { getAdmissions, addAdmission, dischargePatient } from '../lib/api';
 import { format, differenceInDays, differenceInHours, parse } from 'date-fns';
 import { Loader2 } from 'lucide-react';
@@ -34,11 +35,11 @@ export default function AdmissionsView() {
       const days = differenceInDays(disDate, admDate);
       const hours = differenceInHours(disDate, admDate) % 24;
       
-      if (days === 0 && hours === 0) return `< 1 ${translate('hours')}`;
+      if (days === 0 && hours === 0) return \`< 1 \${translate('hours')}\`;
       
       let res = '';
-      if (days > 0) res += `${days} ${translate('days')} `;
-      if (hours > 0) res += `${hours} ${translate('hours')}`;
+      if (days > 0) res += \`\${days} \${translate('days')} \`;
+      if (hours > 0) res += \`\${hours} \${translate('hours')}\`;
       
       return res.trim();
     } catch(e) {
@@ -79,7 +80,7 @@ export default function AdmissionsView() {
       await loadData();
     } catch (err: any) {
       console.error(err);
-      alert(translate('saveError') + '\n\n' + (err.message || ''));
+      alert(translate('saveError') + '\\n\\n' + (err.message || ''));
     } finally {
       setSubmitting(false);
     }
@@ -161,8 +162,7 @@ export default function AdmissionsView() {
       </div>
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        {/* Desktop Table */}
-        <div className="hidden md:block overflow-x-auto">
+        <div className="overflow-x-auto">
           <table className="w-full text-left rtl:text-right">
             <thead className="bg-gray-50 border-b border-gray-100">
               <tr>
@@ -198,7 +198,7 @@ export default function AdmissionsView() {
                     <td className="p-4">{item.patientName || '-'}</td>
                     <td className="p-4">{item.ward || '-'}</td>
                     <td className="p-4">
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${(item.status === 'دخول' || item.type === 'دخول') && !item.dischargeDate ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
+                      <span className={\`px-3 py-1 rounded-full text-xs font-medium \${(item.status === 'دخول' || item.type === 'دخول') && !item.dischargeDate ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}\`}>
                         {item.dischargeDate ? 'خروج' : (item.status || item.type || 'دخول')}
                       </span>
                     </td>
@@ -219,61 +219,10 @@ export default function AdmissionsView() {
             </tbody>
           </table>
         </div>
-
-        {/* Mobile Cards */}
-        <div className="md:hidden flex flex-col divide-y divide-gray-100">
-          {loading ? (
-            <div className="p-8 text-center text-gray-500">
-              <Loader2 className="w-6 h-6 animate-spin mx-auto" />
-            </div>
-          ) : data.length === 0 ? (
-            <div className="p-8 text-center text-gray-500">
-              {translate('noData')}
-            </div>
-          ) : (
-            data.map((item, i) => (
-              <div key={item.id || i} className="p-4 space-y-3 hover:bg-gray-50 transition-colors">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="font-medium text-gray-900">{item.patientName || '-'}</h3>
-                    <div className="text-sm text-gray-500 mt-1">ID: {item.patientId}</div>
-                  </div>
-                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${(item.status === 'دخول' || item.type === 'دخول') && !item.dischargeDate ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
-                    {item.dischargeDate ? 'خروج' : (item.status || item.type || 'دخول')}
-                  </span>
-                </div>
-                
-                <div className="grid grid-cols-2 gap-2 text-sm bg-gray-50 p-3 rounded-lg">
-                  <div>
-                    <span className="text-gray-500 block text-xs">الجناح</span>
-                    <span className="font-medium">{item.ward || '-'}</span>
-                  </div>
-                  <div>
-                    <span className="text-gray-500 block text-xs">{translate('los')}</span>
-                    <span className="font-medium">{item.dischargeDate ? calculateLOS(item.admissionDate || item.date, item.dischargeDate) : '-'}</span>
-                  </div>
-                  <div>
-                    <span className="text-gray-500 block text-xs">تاريخ الدخول</span>
-                    <span className="font-medium">{item.admissionDate || item.date || '-'}</span>
-                  </div>
-                  <div>
-                    <span className="text-gray-500 block text-xs">تاريخ الخروج</span>
-                    <span className="font-medium">{item.dischargeDate || '-'}</span>
-                  </div>
-                </div>
-                
-                {item.dischargeDate && (
-                  <div className="text-sm bg-gray-50 p-3 rounded-lg border border-gray-100">
-                    <span className="text-gray-500 block text-xs mb-1">بيانات الخروج</span>
-                    <div>السبب: <span className="font-medium">{item.dischargeReason || '-'}</span></div>
-                    <div>النوع: <span className="font-medium">{item.dischargeType || '-'}</span></div>
-                  </div>
-                )}
-              </div>
-            ))
-          )}
-        </div>
       </div>
     </div>
   );
 }
+`;
+
+fs.writeFileSync('src/components/AdmissionsView.tsx', content);

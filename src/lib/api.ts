@@ -21,6 +21,8 @@ export const fetchApi = async (endpoint: string, options: RequestInit = {}) => {
 
     if (endpoint === 'admissions') {
       action = options.method === 'POST' ? 'addAdmission' : 'getAdmissions';
+    } else if (endpoint === 'discharge') {
+      action = 'dischargePatient';
     } else if (endpoint === 'bedsores') {
       action = options.method === 'POST' ? 'addBedsore' : 'getBedsores';
     } else if (endpoint === 'infections') {
@@ -106,3 +108,5 @@ export const addCardiac = (data: any) => fetchApi('cardiac', { method: 'POST', b
 
 export const getRRT = () => fetchApi('rrt');
 export const addRRT = (data: any) => fetchApi('rrt', { method: 'POST', body: JSON.stringify(data) });
+
+export const dischargePatient = (data: any) => fetchApi('discharge', { method: 'POST', body: JSON.stringify(data) });

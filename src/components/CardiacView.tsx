@@ -94,7 +94,8 @@ try {
         <div className="p-6 border-b border-gray-100">
           <h2 className="text-xl font-bold">سجل حالات الكود بلو</h2>
         </div>
-        <div className="overflow-x-auto">
+        {/* Desktop Table */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-right">
             <thead className="bg-gray-50 text-gray-600">
               <tr>
@@ -124,6 +125,39 @@ try {
               )}
             </tbody>
           </table>
+        </div>
+
+        {/* Mobile Cards */}
+        <div className="md:hidden flex flex-col divide-y divide-gray-100">
+          {loading ? (
+            <div className="p-8 text-center text-gray-500">جاري التحميل...</div>
+          ) : data.length === 0 ? (
+            <div className="p-8 text-center text-gray-500">لا توجد بيانات</div>
+          ) : (
+            data.map((item, i) => (
+              <div key={i} className="p-4 space-y-3 hover:bg-gray-50">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="font-medium text-gray-900">{item.patientName || '-'}</h3>
+                    <div className="text-sm text-gray-500 mt-1">ID: {item.patientId}</div>
+                  </div>
+                  <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-medium">
+                    {item.responseTime} دقيقة
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-sm bg-gray-50 p-3 rounded-lg">
+                  <div>
+                    <span className="text-gray-500 block text-xs">التاريخ والوقت</span>
+                    <span className="font-medium">{item.date}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500 block text-xs">النتيجة</span>
+                    <span className="font-medium">{item.outcome}</span>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
     </div>
