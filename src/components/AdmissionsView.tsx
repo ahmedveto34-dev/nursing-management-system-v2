@@ -20,8 +20,12 @@ export default function AdmissionsView() {
   }, []);
 
   const handlePatientIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const id = e.target.value;
-    setPatientIdInput(id);
+    setPatientIdInput(e.target.value);
+  };
+
+  // Validate whenever patientIdInput, formType, or data changes
+  useEffect(() => {
+    const id = patientIdInput;
     
     if (!id) {
       setPatientNameInput('');
@@ -30,7 +34,9 @@ export default function AdmissionsView() {
       return;
     }
     
-    const patientRecords = data.filter(d => String(d.patientId) === String(id));
+    // Safety fallback: sometimes data might be stale or undefined
+    const safeData = data || [];
+    const patientRecords = safeData.filter(d => String(d.patientId).trim() === String(id).trim());
     
     if (patientRecords.length > 0) {
       setIsExistingPatient(true);
@@ -55,16 +61,13 @@ export default function AdmissionsView() {
       } else {
         setPatientExistsError('');
       }
-      setPatientNameInput('');
+      // Only clear name if we are typing a new unknown patient, 
+      // but maybe they are currently typing the name, so don't clear it forcefully on every stroke if not خروج
+      if (formType === 'خروج') {
+         setPatientNameInput('');
+      }
     }
-  };
-
-  // Re-validate on formType change
-  useEffect(() => {
-    if (patientIdInput) {
-       handlePatientIdChange({ target: { value: patientIdInput } } as any);
-    }
-  }, [formType, data]);
+  }, [patientIdInput, formType, data]);
 
   const loadData = async () => {
     try {

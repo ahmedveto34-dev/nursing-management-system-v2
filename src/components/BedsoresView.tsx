@@ -18,16 +18,19 @@ export default function BedsoresView() {
   }, []);
 
   const handlePatientIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const id = e.target.value;
-    setPatientIdInput(id);
-    
+    setPatientIdInput(e.target.value);
+  };
+
+  useEffect(() => {
+    const id = patientIdInput;
     if (!id) {
       setPatientNameInput('');
       setIsExistingPatient(false);
       return;
     }
     
-    const patientRecords = data.filter(d => String(d.patientId) === String(id));
+    const safeData = data || [];
+    const patientRecords = safeData.filter(d => String(d.patientId).trim() === String(id).trim());
     if (patientRecords.length > 0) {
       setIsExistingPatient(true);
       const recordWithName = patientRecords.find(d => d.patientName);
@@ -36,9 +39,8 @@ export default function BedsoresView() {
       }
     } else {
       setIsExistingPatient(false);
-      setPatientNameInput('');
     }
-  };
+  }, [patientIdInput, data]);
 
   const loadData = async () => {
     

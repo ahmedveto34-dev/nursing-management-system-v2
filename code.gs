@@ -114,13 +114,19 @@ function addOrUpdateAdmission(ss, sheetName, payload) {
   }
   
   if (targetRow > -1) {
-    var admDateIdx = headers.indexOf('admissionDate');
+    var admDateIdx = headers.indexOf('admissionDate') > -1 ? headers.indexOf('admissionDate') : headers.indexOf('date');
     var wardIdx = headers.indexOf('ward');
-    var statusIdx = headers.indexOf('status');
+    var statusIdx = headers.indexOf('status') > -1 ? headers.indexOf('status') : headers.indexOf('type');
     var nameIdx = headers.indexOf('patientName');
     var disDateIdx = headers.indexOf('dischargeDate');
     var disReasonIdx = headers.indexOf('dischargeReason');
     var disTypeIdx = headers.indexOf('dischargeType');
+    
+    // Ensure missing columns are added
+    if (nameIdx === -1) { sheet.getRange(1, headers.length + 1).setValue('patientName'); nameIdx = headers.length++; }
+    if (disDateIdx === -1) { sheet.getRange(1, headers.length + 1).setValue('dischargeDate'); disDateIdx = headers.length++; }
+    if (disReasonIdx === -1) { sheet.getRange(1, headers.length + 1).setValue('dischargeReason'); disReasonIdx = headers.length++; }
+    if (disTypeIdx === -1) { sheet.getRange(1, headers.length + 1).setValue('dischargeType'); disTypeIdx = headers.length++; }
     
     if (admDateIdx > -1) sheet.getRange(targetRow, admDateIdx + 1).setValue(payload.admissionDate);
     if (wardIdx > -1) sheet.getRange(targetRow, wardIdx + 1).setValue(payload.ward);
