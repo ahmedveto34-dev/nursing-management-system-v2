@@ -30,7 +30,7 @@ export default function AdmissionsView() {
       return;
     }
     
-    const patientRecords = data.filter(d => d.patientId === id);
+    const patientRecords = data.filter(d => String(d.patientId) === String(id));
     
     if (patientRecords.length > 0) {
       setIsExistingPatient(true);
@@ -74,6 +74,17 @@ export default function AdmissionsView() {
       console.error(e);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const formatDate = (dateStr: string) => {
+    if (!dateStr) return '-';
+    try {
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return dateStr;
+      return format(d, 'yyyy-MM-dd HH:mm');
+    } catch (e) {
+      return dateStr;
     }
   };
 
@@ -259,7 +270,7 @@ export default function AdmissionsView() {
               ) : (
                 activeAdmissions.map((item, i) => (
                   <tr key={item.id || i} className="hover:bg-gray-50 transition-colors">
-                    <td className="p-4 text-sm">{item.admissionDate || item.date || '-'}</td>
+                    <td className="p-4 text-sm whitespace-nowrap">{formatDate(item.admissionDate || item.date)}</td>
                     <td className="p-4 text-sm">{item.dischargeDate || '-'}</td>
                     <td className="p-4 font-medium">{item.patientId}</td>
                     <td className="p-4">{item.patientName || '-'}</td>
@@ -324,7 +335,7 @@ export default function AdmissionsView() {
                   </div>
                   <div>
                     <span className="text-gray-500 block text-xs">تاريخ الدخول</span>
-                    <span className="font-medium">{item.admissionDate || item.date || '-'}</span>
+                    <span className="font-medium">{formatDate(item.admissionDate || item.date)}</span>
                   </div>
                   <div>
                     <span className="text-gray-500 block text-xs">تاريخ الخروج</span>

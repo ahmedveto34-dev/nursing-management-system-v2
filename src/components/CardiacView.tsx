@@ -27,7 +27,7 @@ export default function CardiacView() {
       return;
     }
     
-    const patientRecords = data.filter(d => d.patientId === id);
+    const patientRecords = data.filter(d => String(d.patientId) === String(id));
     if (patientRecords.length > 0) {
       setIsExistingPatient(true);
       const recordWithName = patientRecords.find(d => d.patientName);
