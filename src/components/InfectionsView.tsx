@@ -10,6 +10,7 @@ export default function InfectionsView() {
   const [submitting, setSubmitting] = useState(false);
   const [patientIdInput, setPatientIdInput] = useState('');
   const [patientNameInput, setPatientNameInput] = useState('');
+  const [isExistingPatient, setIsExistingPatient] = useState(false);
   const { translate } = useLanguage();
 
   useEffect(() => {
@@ -22,16 +23,19 @@ export default function InfectionsView() {
     
     if (!id) {
       setPatientNameInput('');
+      setIsExistingPatient(false);
       return;
     }
     
     const patientRecords = data.filter(d => d.patientId === id);
     if (patientRecords.length > 0) {
+      setIsExistingPatient(true);
       const recordWithName = patientRecords.find(d => d.patientName);
       if (recordWithName) {
         setPatientNameInput(recordWithName.patientName);
       }
     } else {
+      setIsExistingPatient(false);
       setPatientNameInput('');
     }
   };
@@ -76,6 +80,7 @@ try {
       form.reset();
       setPatientIdInput('');
       setPatientNameInput('');
+      setIsExistingPatient(false);
       await loadData();
     } catch (err: any) {
       console.error(err);
@@ -97,7 +102,7 @@ try {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">{translate('patientName')}</label>
-            <input required name="patientName" type="text" value={patientNameInput} onChange={(e) => setPatientNameInput(e.target.value)} className="w-full rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-indigo-500" />
+            <input required name="patientName" type="text" value={patientNameInput} onChange={(e) => setPatientNameInput(e.target.value)} readOnly={isExistingPatient} className={`w-full rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-indigo-500 ${isExistingPatient ? 'bg-gray-100 cursor-not-allowed' : ''}`} />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">نوع العدوى</label>
