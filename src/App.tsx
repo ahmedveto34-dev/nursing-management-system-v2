@@ -202,6 +202,9 @@ export default function App() {
           <div className="max-w-7xl mx-auto print:max-w-none">
              {renderView()}
           </div>
+          <div className="max-w-7xl mx-auto print:max-w-none mt-12 text-sm text-slate-400 font-medium pb-8 w-full text-right" dir="rtl">
+            <span className="print:text-black">(تحت إشراف مس/ هبة كريم)</span>
+          </div>
         </div>
       </main>
     </div>
