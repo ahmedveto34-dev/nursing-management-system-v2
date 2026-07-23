@@ -29,6 +29,8 @@ export const fetchApi = async (endpoint: string, options: RequestInit = {}) => {
       action = options.method === 'POST' ? 'addFall' : 'getFalls';
     } else if (endpoint === 'cardiac') {
       action = options.method === 'POST' ? 'addCardiac' : 'getCardiac';
+    } else if (endpoint === 'rrt') {
+      action = options.method === 'POST' ? 'addRRT' : 'getRRT';
     }
 
     if (options.body) {
@@ -98,3 +100,6 @@ export const addFall = (data: any) => fetchApi('falls', { method: 'POST', body: 
 
 export const getCardiac = () => fetchApi('cardiac');
 export const addCardiac = (data: any) => fetchApi('cardiac', { method: 'POST', body: JSON.stringify(data) });
+
+export const getRRT = () => fetchApi('rrt');
+export const addRRT = (data: any) => fetchApi('rrt', { method: 'POST', body: JSON.stringify(data) });

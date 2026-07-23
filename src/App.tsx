@@ -6,9 +6,10 @@ import BedsoresView from './components/BedsoresView';
 import InfectionsView from './components/InfectionsView';
 import FallsView from './components/FallsView';
 import CardiacView from './components/CardiacView';
+import RRTView from './components/RRTView';
 import { useLanguage } from './lib/LanguageContext';
 
-type View = 'dashboard' | 'admissions' | 'bedsores' | 'infections' | 'falls' | 'cardiac';
+type View = 'dashboard' | 'admissions' | 'bedsores' | 'infections' | 'falls' | 'cardiac' | 'rrt';
 
 export default function App() {
   const [activeView, setActiveView] = useState<View>('dashboard');
@@ -92,6 +93,7 @@ export default function App() {
       case 'infections': return <InfectionsView />;
       case 'falls': return <FallsView />;
       case 'cardiac': return <CardiacView />;
+      case 'rrt': return <RRTView />;
       default: return <DashboardView />;
     }
   };
@@ -103,6 +105,7 @@ export default function App() {
     { id: 'infections', label: translate('infections'), icon: AlertTriangle },
     { id: 'falls', label: translate('falls'), icon: AlertTriangle },
     { id: 'cardiac', label: translate('cardiac'), icon: HeartPulse },
+    { id: 'rrt', label: translate('rrt'), icon: Activity },
   ] as const;
 
   return (

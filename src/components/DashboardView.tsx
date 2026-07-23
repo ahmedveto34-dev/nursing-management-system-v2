@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getAdmissions, getBedsores, getInfections, getFalls, getCardiac } from '../lib/api';
+import { getAdmissions, getBedsores, getInfections, getFalls, getCardiac, getRRT } from '../lib/api';
 import { Printer, Users, Activity, AlertTriangle, HeartPulse } from 'lucide-react';
 import { format } from 'date-fns';
 import { ar, enUS } from 'date-fns/locale';
@@ -12,7 +12,8 @@ export default function DashboardView() {
     bedsores: 0,
     infections: 0,
     falls: 0,
-    cardiac: 0
+    cardiac: 0,
+    rrt: 0
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -27,12 +28,13 @@ export default function DashboardView() {
     setError(null);
     try {
       // Let it throw if it fails, so we can catch the message
-      const [admissions, bedsores, infections, falls, cardiac] = await Promise.all([
+      const [admissions, bedsores, infections, falls, cardiac, rrt] = await Promise.all([
         getAdmissions(),
         getBedsores(),
         getInfections(),
         getFalls(),
-        getCardiac()
+        getCardiac(),
+        getRRT()
       ]);
 
       const currentMonth = new Date().getMonth();
@@ -47,6 +49,7 @@ export default function DashboardView() {
         infections: infections.filter((i: any) => isCurrentMonth(i.date)).length,
         falls: falls.filter((f: any) => isCurrentMonth(f.date)).length,
         cardiac: cardiac.filter((c: any) => isCurrentMonth(c.date)).length,
+        rrt: rrt.filter((r: any) => isCurrentMonth(r.date)).length,
       });
     } catch (e: any) {
       console.error("Failed to load stats", e);
@@ -85,6 +88,7 @@ export default function DashboardView() {
         <StatCard title={translate('acquiredInfections')} value={stats.infections} icon={AlertTriangle} color="red" />
         <StatCard title={translate('totalFalls')} value={stats.falls} icon={AlertTriangle} color="yellow" />
         <StatCard title={translate('codeBlueCases')} value={stats.cardiac} icon={HeartPulse} color="rose" />
+        <StatCard title={translate('totalRRT')} value={stats.rrt} icon={Activity} color="blue" />
       </div>
 
       <div className="mt-12 p-6 bg-white rounded-2xl border border-gray-100 shadow-sm print:shadow-none print:border-gray-300">

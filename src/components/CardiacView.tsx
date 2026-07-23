@@ -115,8 +115,8 @@ try {
                   <tr key={i} className="hover:bg-gray-50">
                     <td className="p-4 text-sm">{item.date}</td>
                     <td className="p-4 font-medium">{item.patientId}</td>
-                    <td className="p-4">{item.patientName || '-'}</td>
-                    <td className="p-4">{item.patientName || '-'}</td>
+                    
+                    
                     <td className="p-4">{item.responseTime} دقيقة</td>
                     <td className="p-4">{item.outcome}</td>
                   </tr>

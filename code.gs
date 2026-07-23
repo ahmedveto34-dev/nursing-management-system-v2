@@ -39,6 +39,10 @@ function doPost(e) {
       result = getSheetData(ss, 'CardiacArrests', ['id', 'date', 'patientId', 'responseTime', 'outcome', 'patientName']);
     } else if (action === 'addCardiac') {
       result = appendRow(ss, 'CardiacArrests', [payload.id, payload.date, payload.patientId, payload.responseTime, payload.outcome, payload.patientName]);
+    } else if (action === 'getRRT') {
+      result = getSheetData(ss, 'RRT', ['id', 'date', 'patientId', 'ward', 'reason', 'outcome', 'patientName']);
+    } else if (action === 'addRRT') {
+      result = appendRow(ss, 'RRT', [payload.id, payload.date, payload.patientId, payload.ward, payload.reason, payload.outcome, payload.patientName]);
     } else {
       throw new Error('عملية غير معروفة: ' + action);
     }
@@ -106,6 +110,7 @@ function appendRow(ss, sheetName, values) {
     else if (sheetName === 'Infections') headers = ['id', 'date', 'patientId', 'infectionType', 'infectionSite', 'isolationProtocol', 'patientName'];
     else if (sheetName === 'Falls') headers = ['id', 'date', 'patientId', 'riskAssessment', 'location', 'postFallAction', 'patientName'];
     else if (sheetName === 'CardiacArrests') headers = ['id', 'date', 'patientId', 'responseTime', 'outcome', 'patientName'];
+    else if (sheetName === 'RRT') headers = ['id', 'date', 'patientId', 'ward', 'reason', 'outcome', 'patientName'];
     
     sheet = ss.insertSheet(sheetName);
     sheet.appendRow(headers);
