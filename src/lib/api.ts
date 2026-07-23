@@ -66,6 +66,9 @@ export const fetchApi = async (endpoint: string, options: RequestInit = {}) => {
 
     const resData = await response.json();
     if (resData && resData.error) {
+      if (resData.error.includes("عملية غير معروفة") || resData.error.includes("Unknown operation")) {
+        throw new Error("يجب تحديث VITE_API_URL في إعدادات Vercel برابط Apps Script الجديد الخاص بك، الرابط الافتراضي لا يحتوي على التحديثات الأخيرة!");
+      }
       throw new Error(resData.error);
     }
     return resData;

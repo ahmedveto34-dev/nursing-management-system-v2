@@ -69,8 +69,13 @@ try {
     setSubmitting(true);
     const form = e.target as HTMLFormElement;
     const formData = new FormData(form);
+    
+    // Use user-provided date, format it nicely, or fallback to current if empty
+    const rawDate = formData.get('date') as string;
+    const dateObj = rawDate ? new Date(rawDate) : new Date();
+
     const payload = {
-      date: format(new Date(), 'yyyy-MM-dd HH:mm'),
+      date: format(dateObj, 'yyyy-MM-dd HH:mm'),
       patientId: formData.get('patientId') as string,
       patientName: formData.get('patientName') as string,
       ward: formData.get('ward'),
@@ -111,6 +116,10 @@ try {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">{translate('patientName')}</label>
             <input required name="patientName" type="text" className="w-full rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-indigo-500" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">التاريخ والوقت</label>
+            <input required name="date" type="datetime-local" defaultValue={format(new Date(), "yyyy-MM-dd'T'HH:mm")} className="w-full rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-indigo-500" />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">{translate('ward')}</label>
