@@ -147,14 +147,14 @@ export default function DashboardView() {
         `}
       </style>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 print-grid">
-        <StatCard title={translate('totalAdmissions')} value={stats.admissions} icon={Users} color="blue" />
-        <StatCard title={translate('totalDischarges')} value={stats.discharges} icon={Users} color="green" />
-        <StatCard title={translate('acquiredBedsores')} value={stats.bedsores} icon={Activity} color="orange" />
-        <StatCard title={translate('acquiredInfections')} value={stats.infections} icon={AlertTriangle} color="red" />
-        <StatCard title={translate('totalFalls')} value={stats.falls} icon={AlertTriangle} color="yellow" />
+        <StatCard title={translate('totalAdmissions')} value={stats.admissions} icon={Users} color="slate" />
+        <StatCard title={translate('totalDischarges')} value={stats.discharges} icon={Users} color="emerald" />
+        <StatCard title={translate('acquiredBedsores')} value={stats.bedsores} icon={Activity} color="amber" />
+        <StatCard title={translate('acquiredInfections')} value={stats.infections} icon={AlertTriangle} color="rose" />
+        <StatCard title={translate('totalFalls')} value={stats.falls} icon={AlertTriangle} color="amber" />
         <StatCard title={translate('codeBlueCases')} value={stats.cardiac} icon={HeartPulse} color="rose" />
-        <StatCard title={translate('totalRRT')} value={stats.rrt} icon={Activity} color="blue" />
-        <StatCard title={translate('patientDays') || "أيام إقامة المرضى"} value={stats.patientDays} icon={Users} color="indigo" />
+        <StatCard title={translate('totalRRT')} value={stats.rrt} icon={Activity} color="slate" />
+        <StatCard title={translate('patientDays') || "أيام إقامة المرضى"} value={stats.patientDays} icon={Users} color="emerald" />
       </div>
 
       <div className="print-footer mt-12 p-6 bg-white rounded-2xl border border-gray-100 shadow-sm print:shadow-none print:border-gray-300">
@@ -176,13 +176,13 @@ export default function DashboardView() {
 
 function StatCard({ title, value, icon: Icon, color }: { title: string, value: number, icon: any, color: string }) {
   const colorClasses = {
-    blue: 'bg-blue-50 text-blue-600',
-    green: 'bg-green-50 text-green-600',
-    orange: 'bg-orange-50 text-orange-600',
-    red: 'bg-red-50 text-red-600',
-    yellow: 'bg-yellow-50 text-yellow-600',
-    rose: 'bg-rose-50 text-rose-600',
-    indigo: 'bg-indigo-50 text-indigo-600',
+    blue: 'bg-slate-50 text-slate-700',
+    green: 'bg-emerald-50 text-emerald-700',
+    orange: 'bg-amber-50 text-amber-700',
+    red: 'bg-rose-50 text-rose-700',
+    yellow: 'bg-amber-50 text-amber-700',
+    rose: 'bg-rose-50 text-rose-700',
+    indigo: 'bg-indigo-50 text-emerald-600',
   }[color];
 
   return (

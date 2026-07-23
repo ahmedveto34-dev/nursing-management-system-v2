@@ -132,7 +132,13 @@ export default function AdmissionsView() {
           status: 'دخول',
           type: 'دخول' // For backward compatibility with old script
         };
-        await addAdmission(payload);
+        
+        addAdmission(payload).catch(err => {
+          console.error(err);
+          // Optional: handle failure
+        });
+        setData(prev => [...prev, { ...payload, id: Date.now().toString() }]);
+
       } else {
         const payload = {
           dischargeDate: dateStr,
@@ -140,14 +146,19 @@ export default function AdmissionsView() {
           dischargeReason: formData.get('dischargeReason') as string,
           dischargeType: formData.get('dischargeType') as string
         };
-        await dischargePatient(payload);
+        
+        dischargePatient(payload).catch(err => {
+          console.error(err);
+        });
+        setData(prev => prev.map(d => String(d.patientId).trim() === String(payload.patientId).trim() && !d.dischargeDate ? { ...d, ...payload, status: 'خروج' } : d));
+
       }
       form.reset();
       setPatientIdInput('');
       setPatientNameInput('');
       setPatientExistsError('');
       setIsExistingPatient(false);
-      await loadData();
+      // loadData(); // Removed to speed up UI
     } catch (err: any) {
       console.error(err);
       alert(translate('saveError') + '\n\n' + (err.message || ''));
@@ -166,7 +177,7 @@ export default function AdmissionsView() {
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-1">{translate('type')}</label>
           <select 
-            className="w-full md:w-1/3 rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-indigo-500"
+            className="w-full md:w-1/3 rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-emerald-500"
             value={formType}
             onChange={(e) => setFormType(e.target.value)}
           >
@@ -183,7 +194,7 @@ export default function AdmissionsView() {
           </datalist>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">{translate('patientId')}</label>
-            <input required name="patientId" type="text" value={patientIdInput} onChange={handlePatientIdChange} list={formType === 'خروج' ? 'active-patients-list' : undefined} className="w-full rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-indigo-500" />
+            <input required name="patientId" type="text" value={patientIdInput} onChange={handlePatientIdChange} list={formType === 'خروج' ? 'active-patients-list' : undefined} className="w-full rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-emerald-500" />
             {patientExistsError && (
               <p className="text-red-500 text-xs mt-1">{patientExistsError}</p>
             )}
@@ -193,30 +204,30 @@ export default function AdmissionsView() {
             <>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">{translate('patientName')}</label>
-                <input required name="patientName" type="text" value={patientNameInput} onChange={(e) => setPatientNameInput(e.target.value)} readOnly={isExistingPatient} className={`w-full rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-indigo-500 ${isExistingPatient ? 'bg-gray-100 cursor-not-allowed' : ''}`} />
+                <input required name="patientName" type="text" value={patientNameInput} onChange={(e) => setPatientNameInput(e.target.value)} readOnly={isExistingPatient} className={`w-full rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-emerald-500 ${isExistingPatient ? 'bg-gray-100 cursor-not-allowed' : ''}`} />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">{translate('ward')}</label>
-                <input required name="ward" type="text" className="w-full rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-indigo-500" />
+                <input required name="ward" type="text" className="w-full rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-emerald-500" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">تاريخ الدخول</label>
-                <input required name="date" type="datetime-local" defaultValue={format(new Date(), "yyyy-MM-dd'T'HH:mm")} className="w-full rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-indigo-500" />
+                <input required name="date" type="datetime-local" defaultValue={format(new Date(), "yyyy-MM-dd'T'HH:mm")} className="w-full rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-emerald-500" />
               </div>
             </>
           ) : (
             <>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">تاريخ الخروج</label>
-                <input required name="date" type="datetime-local" defaultValue={format(new Date(), "yyyy-MM-dd'T'HH:mm")} className="w-full rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-indigo-500" />
+                <input required name="date" type="datetime-local" defaultValue={format(new Date(), "yyyy-MM-dd'T'HH:mm")} className="w-full rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-emerald-500" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">سبب الخروج</label>
-                <input required name="dischargeReason" type="text" className="w-full rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-indigo-500" />
+                <input required name="dischargeReason" type="text" className="w-full rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-emerald-500" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">نوع الخروج</label>
-                <select required name="dischargeType" className="w-full rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-indigo-500">
+                <select required name="dischargeType" className="w-full rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-emerald-500">
                   <option value="">اختر...</option>
                   <option value="تحسن">تحسن</option>
                   <option value="نقل لمستشفى آخر">نقل لمستشفى آخر</option>
@@ -232,7 +243,7 @@ export default function AdmissionsView() {
             <button
               type="submit"
               disabled={submitting || !!patientExistsError}
-              className="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 disabled:opacity-50 flex items-center gap-2"
+              className="bg-emerald-600 text-white px-6 py-2 rounded-lg hover:bg-emerald-700 disabled:opacity-50 flex items-center gap-2"
             >
               {submitting && <Loader2 className="w-4 h-4 animate-spin" />}
               {translate('save')}

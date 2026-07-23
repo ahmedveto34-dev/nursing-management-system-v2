@@ -78,12 +78,17 @@ try {
         }
       }
 
-      await addInfection(payload);
+      
+        addInfection(payload).catch(err => {
+          console.error(err);
+        });
+        setData(prev => [...prev, { ...payload, id: Date.now().toString() }]);
+
       form.reset();
       setPatientIdInput('');
       setPatientNameInput('');
       setIsExistingPatient(false);
-      await loadData();
+      // loadData(); // Removed to speed up UI
     } catch (err: any) {
       console.error(err);
       alert('حدث خطأ أثناء الحفظ\n' + err.message);
@@ -99,24 +104,24 @@ try {
         <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">{translate('patientId')}</label>
-            <input required name="patientId" type="text" value={patientIdInput} onChange={handlePatientIdChange} className="w-full rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-indigo-500" />
+            <input required name="patientId" type="text" value={patientIdInput} onChange={handlePatientIdChange} className="w-full rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-emerald-500" />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">{translate('patientName')}</label>
-            <input required name="patientName" type="text" value={patientNameInput} onChange={(e) => setPatientNameInput(e.target.value)} readOnly={isExistingPatient} className={`w-full rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-indigo-500 ${isExistingPatient ? 'bg-gray-100 cursor-not-allowed' : ''}`} />
+            <input required name="patientName" type="text" value={patientNameInput} onChange={(e) => setPatientNameInput(e.target.value)} readOnly={isExistingPatient} className={`w-full rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-emerald-500 ${isExistingPatient ? 'bg-gray-100 cursor-not-allowed' : ''}`} />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">نوع العدوى</label>
-            <input required name="infectionType" type="text" placeholder="مثال: VAP, CLABSI, CAUTI" className="w-full rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-indigo-500" />
+            <input required name="infectionType" type="text" placeholder="مثال: VAP, CLABSI, CAUTI" className="w-full rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-emerald-500" />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">مكان العدوى (Site)</label>
-            <input required name="infectionSite" type="text" className="w-full rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-indigo-500" />
+            <input required name="infectionSite" type="text" className="w-full rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-emerald-500" />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">بروتوكول العزل</label>
-            <select required name="isolationProtocol" className="w-full rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-indigo-500">
+            <select required name="isolationProtocol" className="w-full rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-emerald-500">
               <option value="تلامس (Contact)">تلامس (Contact)</option>
               <option value="رذاذ (Droplet)">رذاذ (Droplet)</option>
               <option value="هواء (Airborne)">هواء (Airborne)</option>
@@ -124,7 +129,7 @@ try {
             </select>
           </div>
           <div className="md:col-span-2">
-            <button disabled={submitting} type="submit" className="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition flex items-center justify-center min-w-[120px]">
+            <button disabled={submitting} type="submit" className="bg-emerald-600 text-white px-6 py-2 rounded-lg hover:bg-emerald-700 transition flex items-center justify-center min-w-[120px]">
               {submitting ? <Loader2 className="w-5 h-5 animate-spin" /> : 'حفظ'}
             </button>
           </div>
