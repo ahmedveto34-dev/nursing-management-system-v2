@@ -1,30 +1,13 @@
 const fs = require('fs');
-let code = fs.readFileSync('src/components/DashboardView.tsx', 'utf8');
+const path = 'src/components/DashboardView.tsx';
+let code = fs.readFileSync(path, 'utf8');
 
-const target1 = `      const currentMonth = new Date().getMonth();
-      const isCurrentMonth = (dateStr: string) => new Date(dateStr).getMonth() === currentMonth;
-      const currentMonthAdmissions = admissions.filter((a: any) => isCurrentMonth(a.date));
-      
-      let totalDays = 0;
-      currentMonthAdmissions.forEach((a: any) => {
-        const admDateStr = a.admissionDate || a.date;
-        const disDateStr = a.dischargeDate;
-        if (admDateStr) {
-          try {
-            const admDate = new Date(admDateStr.replace(' ', 'T'));
-            const disDate = disDateStr ? new Date(disDateStr.replace(' ', 'T')) : new Date();
-            const days = Math.floor((disDate.getTime() - admDate.getTime()) / (1000 * 60 * 60 * 24));
-            if (days > 0) {
-              totalDays += days;
-            } else if (days === 0 && disDateStr) {
-               // if discharged same day, count as 1 or 0? Usually 1 day for admissions that discharge same day.
-               totalDays += 1;
-            }
-          } catch(e) {}
-        }
-      });`;
+const lines = code.split('\n');
+const startIdx = lines.findIndex(l => l.includes('const currentMonth = new Date().getMonth();'));
+const endIdx = lines.findIndex(l => l.includes('patientDays: totalDays'));
 
-const replacement1 = `      const now = new Date();
+if (startIdx !== -1 && endIdx !== -1) {
+  const newLines = `      const now = new Date();
       const currentMonth = now.getMonth();
       const currentYear = now.getFullYear();
       const isCurrentMonth = (dateStr: string) => {
@@ -74,28 +57,21 @@ const replacement1 = `      const now = new Date();
             }
           } catch(e) {}
         }
-      });`;
+      });
 
-if (code.includes(target1)) {
-  code = code.replace(target1, replacement1);
-  console.log("Replacement 1 successful");
-} else {
-  console.log("Target 1 not found");
-}
-
-const target2 = `      setStats({
-        admissions: currentMonthAdmissions.filter((a: any) => a.type === 'دخول' || a.type === 'Admission' || a.status === 'دخول').length,
-        discharges: currentMonthAdmissions.filter((a: any) => a.dischargeDate || a.type === 'خروج' || a.type === 'Discharge').length,`;
-
-const replacement2 = `      setStats({
+      setStats({
         admissions: currentMonthAdmissions.length,
-        discharges: currentMonthDischarges.length,`;
-
-if (code.includes(target2)) {
-  code = code.replace(target2, replacement2);
-  console.log("Replacement 2 successful");
+        discharges: currentMonthDischarges.length,
+        bedsores: bedsores.filter((b: any) => isCurrentMonth(b.date)).length,
+        infections: infections.filter((i: any) => isCurrentMonth(i.date)).length,
+        falls: falls.filter((f: any) => isCurrentMonth(f.date)).length,
+        cardiac: cardiac.filter((c: any) => isCurrentMonth(c.date)).length,
+        rrt: rrt.filter((r: any) => isCurrentMonth(r.date)).length,
+        patientDays: totalDays`;
+  
+  lines.splice(startIdx, endIdx - startIdx + 1, newLines);
+  fs.writeFileSync(path, lines.join('\n'));
+  console.log("Fixed successfully");
 } else {
-  console.log("Target 2 not found");
+  console.log("Could not find bounds", startIdx, endIdx);
 }
-
-fs.writeFileSync('src/components/DashboardView.tsx', code);
