@@ -38,35 +38,71 @@ export default function DashboardView() {
         getRRT()
       ]);
 
+const parseDateRobust = (dateStr: string) => {
+        if (!dateStr) return new Date(NaN);
+        let d = new Date(dateStr);
+        if (!isNaN(d.getTime())) return d;
+        
+        if (dateStr.includes('-') && dateStr.includes(' ')) {
+          d = new Date(dateStr.replace(' ', 'T'));
+          if (!isNaN(d.getTime())) return d;
+        }
+        
+        const parts = dateStr.split(/[\/\-\s]/);
+        if (parts.length >= 3) {
+           const day = parseInt(parts[0], 10);
+           const month = parseInt(parts[1], 10) - 1;
+           const year = parseInt(parts[2], 10);
+           
+           if (day <= 31 && month >= 0 && month <= 11 && year > 2000) {
+             let d2 = new Date(year, month, day);
+             if (!isNaN(d2.getTime())) return d2;
+           }
+           
+           const yearFirst = parseInt(parts[0], 10);
+           const monthFirst = parseInt(parts[1], 10) - 1;
+           const dayFirst = parseInt(parts[2], 10);
+           
+           if (yearFirst > 2000 && monthFirst >= 0 && monthFirst <= 11 && dayFirst <= 31) {
+             let d3 = new Date(yearFirst, monthFirst, dayFirst);
+             if (!isNaN(d3.getTime())) return d3;
+           }
+        }
+        return new Date(NaN);
+      };
+
       const now = new Date();
       const currentMonth = now.getMonth();
       const currentYear = now.getFullYear();
+      
       const isCurrentMonth = (dateStr: string) => {
-        if (!dateStr) return false;
-        const d = new Date(dateStr.replace(' ', 'T'));
+        const d = parseDateRobust(dateStr);
         if (isNaN(d.getTime())) return false;
         return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
       };
       
-      const currentMonthAdmissions = admissions.filter((a: any) => isCurrentMonth(a.admissionDate || a.date));
-      const currentMonthDischarges = admissions.filter((a: any) => a.dischargeDate && isCurrentMonth(a.dischargeDate));
+      const isAdmission = (a: any) => a.type === 'دخول' || a.type === 'Admission' || String(a.status).trim() === 'دخول' || !a.type;
+      const isDischarge = (a: any) => a.dischargeDate || a.type === 'خروج' || a.type === 'Discharge' || String(a.status).trim() === 'خروج';
+
+      const currentMonthAdmissions = admissions.filter((a: any) => isAdmission(a) && isCurrentMonth(a.admissionDate || a.date));
+      const currentMonthDischarges = admissions.filter((a: any) => isDischarge(a) && isCurrentMonth(a.dischargeDate || a.date));
       
       const monthStart = new Date(currentYear, currentMonth, 1).getTime();
       const monthEnd = new Date(currentYear, currentMonth + 1, 0, 23, 59, 59).getTime();
 
       let totalDays = 0;
-      admissions.forEach((a: any) => {
+      admissions.filter(isAdmission).forEach((a: any) => {
         const admDateStr = a.admissionDate || a.date;
         const disDateStr = a.dischargeDate;
         if (admDateStr) {
           try {
-            const d = new Date(admDateStr.replace(' ', 'T'));
+            const d = parseDateRobust(admDateStr);
             if (isNaN(d.getTime())) return;
             const admDate = d.getTime();
             
             let disDate = now.getTime();
             if (disDateStr) {
-              const d2 = new Date(disDateStr.replace(' ', 'T'));
+              const d2 = parseDateRobust(disDateStr);
               if (!isNaN(d2.getTime())) {
                 disDate = d2.getTime();
               }
@@ -90,7 +126,7 @@ export default function DashboardView() {
         }
       });
 
-      setStats({
+            setStats({
         admissions: currentMonthAdmissions.length,
         discharges: currentMonthDischarges.length,
         bedsores: bedsores.filter((b: any) => isCurrentMonth(b.date)).length,
