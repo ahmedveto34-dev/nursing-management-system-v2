@@ -9,6 +9,7 @@ import FallsView from './components/FallsView';
 import CardiacView from './components/CardiacView';
 import RRTView from './components/RRTView';
 import { useLanguage } from './lib/LanguageContext';
+import { Toast } from './components/Toast';
 
 type View = 'dashboard' | 'admissions' | 'archive' | 'bedsores' | 'infections' | 'falls' | 'cardiac' | 'rrt';
 

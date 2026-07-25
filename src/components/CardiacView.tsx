@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { showToast } from './Toast';
 import { getCardiac, addCardiac } from '../lib/api';
 import { format } from 'date-fns';
 import { Loader2 } from 'lucide-react';
@@ -84,6 +85,7 @@ try {
         setData(prev => [...prev, { ...payload, id: Date.now().toString() }]);
 
       form.reset();
+      showToast('كل مؤشر صحي يتم تسجيله بدقة هو خطوة نحو رعاية أفضل وسلامة أكبر للمريض.');
       setPatientIdInput('');
       setPatientNameInput('');
       setIsExistingPatient(false);

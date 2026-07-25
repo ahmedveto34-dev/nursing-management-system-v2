@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { showToast } from './Toast';
 import { getAdmissions, addAdmission, dischargePatient } from '../lib/api';
 import { format, differenceInDays, differenceInHours, parse } from 'date-fns';
 import { Loader2 } from 'lucide-react';
@@ -154,6 +155,7 @@ export default function AdmissionsView() {
 
       }
       form.reset();
+      showToast('كل مؤشر صحي يتم تسجيله بدقة هو خطوة نحو رعاية أفضل وسلامة أكبر للمريض.');
       setPatientIdInput('');
       setPatientNameInput('');
       setPatientExistsError('');
