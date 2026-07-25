@@ -127,10 +127,66 @@ app.post('/api/discharge', async (req, res) => {
       return res.json({ success: true, mock: true });
     }
 
-    // In a real scenario, you'd find the row and update it. 
-    // For simplicity, we just append a discharge record or you'd need to use sheets.spreadsheets.values.update
-    // Assuming updating the row is complex, let's just return success for now if it's not fully implemented.
-    res.json({ success: true, message: "Discharge endpoint requires row update implementation." });
+    // 1. Fetch all rows to find the one we need to update
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId: getSpreadsheetId(),
+      range: 'Admissions!A:I',
+    });
+    
+    const rows = response.data.values || [];
+    // Search backwards for the latest active admission for this patient
+    let targetRowIndex = -1;
+    let existingRowData = [];
+    
+    for (let i = rows.length - 1; i >= 0; i--) {
+      const row = rows[i];
+      // row[2] is patientId, row[6] is dischargeDate
+      if (row[2] === patientId && (!row[6] || String(row[6]).trim() === '')) {
+        targetRowIndex = i;
+        existingRowData = row;
+        break;
+      }
+    }
+    
+    if (targetRowIndex === -1) {
+      // Fallback: If no active admission found, maybe we just append a new discharge row
+      const id = Date.now().toString();
+      await sheets.spreadsheets.values.append({
+        spreadsheetId: getSpreadsheetId(),
+        range: 'Admissions!A:I',
+        valueInputOption: 'USER_ENTERED',
+        requestBody: {
+          values: [[id, dischargeDate, patientId, '', 'خروج', '', dischargeDate, dischargeReason, dischargeType]],
+        },
+      });
+      return res.json({ success: true, message: "Appended as new row since active admission not found" });
+    }
+    
+    // 2. Update the row
+    // The sheet row number is targetRowIndex + 1
+    const rowNum = targetRowIndex + 1;
+    
+    // Ensure the row has enough elements up to index 8
+    while(existingRowData.length < 9) {
+       existingRowData.push('');
+    }
+    
+    // Update the relevant fields
+    existingRowData[4] = 'خروج'; // status/type
+    existingRowData[6] = dischargeDate;
+    existingRowData[7] = dischargeReason;
+    existingRowData[8] = dischargeType;
+    
+    await sheets.spreadsheets.values.update({
+      spreadsheetId: getSpreadsheetId(),
+      range: `Admissions!A${rowNum}:I${rowNum}`,
+      valueInputOption: 'USER_ENTERED',
+      requestBody: {
+        values: [existingRowData],
+      },
+    });
+
+    res.json({ success: true, message: "Row updated successfully." });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }

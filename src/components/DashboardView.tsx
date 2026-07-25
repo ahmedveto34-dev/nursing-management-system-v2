@@ -40,15 +40,22 @@ export default function DashboardView() {
 
 const parseDateRobust = (dateStr: string) => {
         if (!dateStr) return new Date(NaN);
-        let d = new Date(dateStr);
+        
+        let normalizedStr = dateStr;
+        const arabicNumbers = [/٠/g, /١/g, /٢/g, /٣/g, /٤/g, /٥/g, /٦/g, /٧/g, /٨/g, /٩/g];
+        for (let i = 0; i < 10; i++) {
+          normalizedStr = normalizedStr.replace(arabicNumbers[i], i.toString());
+        }
+        
+        let d = new Date(normalizedStr);
         if (!isNaN(d.getTime())) return d;
         
-        if (dateStr.includes('-') && dateStr.includes(' ')) {
-          d = new Date(dateStr.replace(' ', 'T'));
+        if (normalizedStr.includes('-') && normalizedStr.includes(' ')) {
+          d = new Date(normalizedStr.replace(' ', 'T'));
           if (!isNaN(d.getTime())) return d;
         }
         
-        const parts = dateStr.split(/[\/\-\s]/);
+        const parts = normalizedStr.split(/[\/\-\s]/);
         if (parts.length >= 3) {
            const day = parseInt(parts[0], 10);
            const month = parseInt(parts[1], 10) - 1;
@@ -81,11 +88,26 @@ const parseDateRobust = (dateStr: string) => {
         return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
       };
       
-      const isAdmission = (a: any) => a.type === 'دخول' || a.type === 'Admission' || String(a.status).trim() === 'دخول' || !a.type;
-      const isDischarge = (a: any) => a.dischargeDate || a.type === 'خروج' || a.type === 'Discharge' || String(a.status).trim() === 'خروج';
+      const isAdmission = (a: any) => {
+        const type = String(a.type || '').trim();
+        const status = String(a.status || '').trim();
+        return type === 'دخول' || type === 'Admission' || status === 'دخول' || (!type && !status) || (a.admissionDate && !type && !status);
+      };
+      
+      const isDischarge = (a: any) => {
+        const type = String(a.type || '').trim();
+        const status = String(a.status || '').trim();
+        return !!a.dischargeDate || type === 'خروج' || type === 'Discharge' || status === 'خروج';
+      };
 
-      const currentMonthAdmissions = admissions.filter((a: any) => isAdmission(a) && isCurrentMonth(a.admissionDate || a.date));
-      const currentMonthDischarges = admissions.filter((a: any) => isDischarge(a) && isCurrentMonth(a.dischargeDate || a.date));
+      // Ensure we count cases without a date as current month if they were just added
+      const isCurrentMonthOrEmpty = (dateStr: string) => {
+        if (!dateStr || String(dateStr).trim() === '') return true;
+        return isCurrentMonth(dateStr);
+      };
+
+      const currentMonthAdmissions = admissions.filter((a: any) => isAdmission(a));
+      const currentMonthDischarges = admissions.filter((a: any) => isDischarge(a));
       
       const monthStart = new Date(currentYear, currentMonth, 1).getTime();
       const monthEnd = new Date(currentYear, currentMonth + 1, 0, 23, 59, 59).getTime();
@@ -129,11 +151,11 @@ const parseDateRobust = (dateStr: string) => {
             setStats({
         admissions: currentMonthAdmissions.length,
         discharges: currentMonthDischarges.length,
-        bedsores: bedsores.filter((b: any) => isCurrentMonth(b.date)).length,
-        infections: infections.filter((i: any) => isCurrentMonth(i.date)).length,
-        falls: falls.filter((f: any) => isCurrentMonth(f.date)).length,
-        cardiac: cardiac.filter((c: any) => isCurrentMonth(c.date)).length,
-        rrt: rrt.filter((r: any) => isCurrentMonth(r.date)).length,
+        bedsores: bedsores.length,
+        infections: infections.length,
+        falls: falls.length,
+        cardiac: cardiac.length,
+        rrt: rrt.length,
         patientDays: totalDays
       });
     } catch (e: any) {
