@@ -106,12 +106,12 @@ try {
         <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">{translate('patientId')}</label>
-            <input required name="patientId" type="text" value={patientIdInput} onChange={handlePatientIdChange} className="w-full rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-emerald-500" />
+            <input required name="patientId" type="text" value={patientIdInput || ""} onChange={handlePatientIdChange} className="w-full rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-emerald-500" />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">{translate('patientName')}</label>
-            <input required name="patientName" type="text" value={patientNameInput} onChange={(e) => setPatientNameInput(e.target.value)} readOnly={isExistingPatient} className={`w-full rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-emerald-500 ${isExistingPatient ? 'bg-gray-100 cursor-not-allowed' : ''}`} />
+            <input required name="patientName" type="text" value={patientNameInput || ""} onChange={(e) => setPatientNameInput(e.target.value)} readOnly={isExistingPatient} className={`w-full rounded-lg border-gray-300 border p-2 focus:ring-2 focus:ring-emerald-500 ${isExistingPatient ? 'bg-gray-100 cursor-not-allowed' : ''}`} />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">مكان القرحة</label>
